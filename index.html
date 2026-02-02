@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sunrise Multiventures</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    .product { border: 1px solid #ccc; padding: 10px; margin: 10px; }
+    .cart { margin-top: 20px; }
+    button { padding: 5px 10px; }
+  </style>
+</head>
+<body>
+  <h1>Sunrise Multiventures - Foodstuff Store</h1>
+
+  <div id="products"></div>
+
+  <div class="cart">
+    <h2>Your Basket</h2>
+    <ul id="cart"></ul>
+    <input type="email" id="customerEmail" placeholder="Enter your email" required>
+    <button onclick="checkout()">Checkout</button>
+  </div>
+
+  <script>
+    const products = [
+      { name: "Garri (1kg)", price: 1200 },
+      { name: "Beans (1kg)", price: 1500 },
+      { name: "Indomie (1 carton)", price: 4500 },
+      { name: "Rice (5kg)", price: 8000 },
+      { name: "Elubo (Yam flour 1kg)", price: 2000 },
+      { name: "Groundnuts (1kg)", price: 1800 }
+    ];
+
+    let cart = [];
+
+    function renderProducts() {
+      const container = document.getElementById("products");
+      products.forEach((p, index) => {
+        container.innerHTML += `
+          <div class="product">
+            <h3>${p.name}</h3>
+            <p>₦${p.price}</p>
+            <button onclick="addToCart(${index})">Add to Basket</button>
+          </div>
+        `;
+      });
+    }
+
+    function addToCart(index) {
+      cart.push(products[index]);
+      renderCart();
+    }
+
+    function renderCart() {
+      const cartList = document.getElementById("cart");
+      cartList.innerHTML = "";
+      cart.forEach(item => {
+        cartList.innerHTML += `<li>${item.name} - ₦${item.price}</li>`;
+      });
+    }
+
+    async function checkout() {
+      const email = document.getElementById("customerEmail").value;
+      if (!email) {
+        alert("Please enter your email!");
+        return;
+      }
+
+      const response = await fetch("/order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ cart, email })
+      });
+
+      if (response.ok) {
+        alert("Order placed successfully! Confirmation email sent.");
+        cart = [];
+        renderCart();
+      } else {
+        alert("Error placing order.");
+      }
+    }
+
+    renderProducts();
+  </script>
+</body>
+</html>
